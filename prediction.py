@@ -30,7 +30,7 @@ def load_data():
     sheets = xls.sheet_names
     return sheets, OUTPUT
 
-# 사이드바 상단에 refresh 버튼
+# 사이드바 상단에 업데이트 버튼
 if st.sidebar.button("데이터 업데이트"):
     # 캐시 초기화 후 rerun
     st.cache_data.clear()
@@ -39,7 +39,6 @@ if st.sidebar.button("데이터 업데이트"):
 sheets, excel_file = load_data()
 
 def plot_prediction_graph(df, sheet_name):
-    # df에는 '일시', '실제수위', '예측 수위(3시간)', '예측 수위(6시간)' 컬럼 존재한다고 가정
     # 최근 30개 데이터 사용
     df_30 = df.sort_values('일시', ascending=False).head(30).sort_values('일시')  # 그래프는 시간오름차순으로 그리기 위해 정렬
     actual_times = df_30['일시']
@@ -48,8 +47,8 @@ def plot_prediction_graph(df, sheet_name):
     predicted_levels_3h = df_30['예측 수위(3시간)']
     predicted_times_6h = df_30['일시']
     predicted_levels_6h = df_30['예측 수위(6시간)']
-    plt.rcParams['font.size'] = 10  # 글씨 크기
-    fig, ax = plt.subplots(figsize=(10, 5))  # 그래프 크기 확대
+    plt.rcParams['font.size'] = 10
+    fig, ax = plt.subplots(figsize=(10, 5))
     ax.plot(predicted_times_3h, predicted_levels_3h, label='예측 수위(3시간)', linestyle='-', marker='o', markersize=4, linewidth=1.5, alpha=0.8, color='orange')
     ax.plot(predicted_times_6h, predicted_levels_6h, label='예측 수위(6시간)', linestyle='--', marker='^', markersize=4, linewidth=1.5, alpha=0.5, color='green')
     ax.plot(actual_times, actual_levels, label='실제 수위', marker='o', markersize=4, linewidth=1.5, color='red')
