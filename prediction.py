@@ -4,6 +4,10 @@ import os
 from datetime import datetime
 import matplotlib.pyplot as plt
 import gdown
+import matplotlib.font_manager as fm
+font_path = f"Nanum_Gothic/NanumGothic-Bold.ttf"
+fm.fontManager.addfont(font_path)
+plt.rcParams['font.family'] = 'NanumGothic'
 
 st.set_page_config(page_title="지점별 예측 결과", layout="wide", initial_sidebar_state="expanded")
 
@@ -44,7 +48,6 @@ def plot_prediction_graph(df, sheet_name):
     predicted_levels_3h = df_30['예측 수위(3시간)']
     predicted_times_6h = df_30['일시']
     predicted_levels_6h = df_30['예측 수위(6시간)']
-    plt.rcParams['font.family'] = 'Malgun Gothic'
     plt.rcParams['font.size'] = 10  # 글씨 크기
     fig, ax = plt.subplots(figsize=(10, 5))  # 그래프 크기 확대
     ax.plot(predicted_times_3h, predicted_levels_3h, label='예측 수위(3시간)', linestyle='-', marker='o', markersize=4, linewidth=1.5, alpha=0.8, color='orange')
