@@ -15,7 +15,8 @@ st.set_page_config(page_title="지점별 예측 결과", layout="wide", initial_
 
 # 상단 고정 타이틀 및 서브타이틀
 st.title("한국수자원조사기술원 홍수위 예측")
-st.write("※ 해당 자료는 A.I. 딥러닝을 통해 학습된 데이터를 기반으로 3시간, 6시간 이후의 수위를 예측한 모델링 자료로, 실제 수위와 차이가 발생할 수 있습니다.")
+st.text("1) 해당 자료는 A.I. 딥러닝을 통해 학습된 데이터를 기반으로 3시간, 6시간 이후의 수위를 예측한 모델링 자료입니다.")
+st.text("2) 예측 데이터는 실제 발생 수위와 차이가 발생할 수 있으니 사용시 유의하시기 바랍니다.")
 
 FILE_ID = "16g4Btk17vNHSTPy-b40kxCESY38g0cD-"
 OUTPUT = "All_Locations_Prediction.xlsx"
@@ -25,7 +26,7 @@ def download_excel_from_google_drive(file_id, output):
     url = f"https://drive.google.com/uc?id={file_id}"
     gdown.download(url, output, quiet=True)
 
-@st.cache_data(show_spinner="엑셀 파일을 로딩중입니다...")
+@st.cache_data(show_spinner="예측 데이터 기초 파일을 로딩중입니다...")
 def load_data():
     # 구글드라이브에서 엑셀 다운로드
     download_excel_from_google_drive(FILE_ID, OUTPUT)
@@ -41,7 +42,7 @@ if 'cached_sheet_figs' not in st.session_state:
     st.session_state.cached_sheet_figs = {}
 
 
-@st.cache_data
+@st.cache_data(show_spinner="지점별 데이터를 로딩중입니다...")
 def load_sheet_data(excel_file, sheet):
     df_sheet = pd.read_excel(excel_file, sheet_name=sheet)
     code = sheet.split("_")[0]
@@ -98,7 +99,6 @@ def plot_prediction_graph(df, sheet_name):
 
     return fig
 
-
 # 사이드바 상단에 업데이트 버튼
 if st.sidebar.button("데이터 업데이트"):
     # 모든 캐시 데이터 삭제
@@ -106,13 +106,15 @@ if st.sidebar.button("데이터 업데이트"):
     st.session_state.cached_sheet_data = {}
     st.session_state.cached_sheet_figs = {}
     st.experimental_rerun()
+st.sidebar.markdown("---")
 
 # 초기 데이터 로드
 sheets, excel_file = load_data()
 
 # 페이지 옵션 설정
+st.sidebar.markdown("<div style='font-size: 20px; font-weight: bold;'>지점 선택</div>", unsafe_allow_html=True)
 page_options = ["메인페이지"] + sheets
-selected_sheet = st.sidebar.selectbox("지점 선택", page_options)
+selected_sheet = st.sidebar.selectbox("", page_options)
 
 if selected_sheet == "메인페이지":
     st.subheader("전체 지점 1일 예측 그래프")
@@ -159,3 +161,11 @@ else:
     # 그래프 출력
     st.write("### 1일 예측 그래프")
     st.pyplot(fig)
+
+st.sidebar.markdown("---")
+st.sidebar.markdown("**프로그램 정보**")
+st.sidebar.markdown("- 작성자 : 영산강조사실 이성호")
+st.sidebar.markdown("- 문의 : 내선번호 937")
+st.sidebar.markdown("- 최종 업데이트 : 2024-12-13")
+st.sidebar.markdown("---")
+st.sidebar.markdown("**데이터 로딩에는 기다림이 필요합니다.**")
