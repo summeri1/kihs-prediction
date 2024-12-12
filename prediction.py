@@ -105,7 +105,7 @@ if st.sidebar.button("데이터 업데이트"):
     st.cache_data.clear()
     st.session_state.cached_sheet_data = {}
     st.session_state.cached_sheet_figs = {}
-    st.experimental_rerun()
+    st.rerun()
 st.sidebar.markdown("---")
 
 # 초기 데이터 로드
