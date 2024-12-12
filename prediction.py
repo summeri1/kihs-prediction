@@ -116,6 +116,14 @@ st.sidebar.markdown("<div style='font-size: 20px; font-weight: bold;'>지점 선
 page_options = ["메인페이지"] + sheets
 selected_sheet = st.sidebar.selectbox("", page_options)
 
+st.sidebar.markdown("---")
+st.sidebar.markdown("**프로그램 정보**")
+st.sidebar.markdown("- 작성자 : 영산강조사실 이성호")
+st.sidebar.markdown("- 문의 : 내선번호 937")
+st.sidebar.markdown("- 최종 업데이트 : 2024-12-13")
+st.sidebar.markdown("---")
+st.sidebar.markdown("**데이터 로딩에는 기다림이 필요합니다.**")
+
 if selected_sheet == "메인페이지":
     st.subheader("전체 지점 1일 예측 그래프")
 
@@ -161,11 +169,3 @@ else:
     # 그래프 출력
     st.write("### 1일 예측 그래프")
     st.pyplot(fig)
-
-st.sidebar.markdown("---")
-st.sidebar.markdown("**프로그램 정보**")
-st.sidebar.markdown("- 작성자 : 영산강조사실 이성호")
-st.sidebar.markdown("- 문의 : 내선번호 937")
-st.sidebar.markdown("- 최종 업데이트 : 2024-12-13")
-st.sidebar.markdown("---")
-st.sidebar.markdown("**데이터 로딩에는 기다림이 필요합니다.**")
