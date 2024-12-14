@@ -11,16 +11,13 @@ font_path = f"Nanum_Gothic/NanumGothic-Bold.ttf"
 fm.fontManager.addfont(font_path)
 plt.rcParams['font.family'] = 'NanumGothic'
 
-st.set_page_config(page_title="지점별 예측 결과", layout="wide", initial_sidebar_state="expanded")
+st.set_page_config(page_title="KIHS 홍수위 예측", layout="wide", initial_sidebar_state="expanded")
 
 # 상단 고정 타이틀 및 서브타이틀
 st.title("한국수자원조사기술원 홍수위 예측")
-st.text("1) 해당 자료는 A.I. 딥러닝을 통해 학습된 데이터를 기반으로 3시간, 6시간 이후의 수위를 예측한 모델링 자료입니다.")
-st.text("2) 예측 데이터는 실제 발생 수위와 차이가 발생할 수 있으니 사용시 유의하시기 바랍니다.")
 
 FILE_ID = "16g4Btk17vNHSTPy-b40kxCESY38g0cD-"
 OUTPUT = "All_Locations_Prediction.xlsx"
-
 
 def download_excel_from_google_drive(file_id, output):
     url = f"https://drive.google.com/uc?id={file_id}"
@@ -33,14 +30,6 @@ def load_data():
     xls = pd.ExcelFile(OUTPUT)
     sheets = xls.sheet_names
     return sheets, OUTPUT
-
-
-# 캐싱된 데이터와 그래프를 저장할 세션 상태 초기화
-if 'cached_sheet_data' not in st.session_state:
-    st.session_state.cached_sheet_data = {}
-if 'cached_sheet_figs' not in st.session_state:
-    st.session_state.cached_sheet_figs = {}
-
 
 @st.cache_data(show_spinner="지점별 데이터를 로딩중입니다...")
 def load_sheet_data(excel_file, sheet):
@@ -56,7 +45,6 @@ def load_sheet_data(excel_file, sheet):
         df_sheet[col] = df_sheet[col].round(2)
 
     return df_sheet
-
 
 def plot_prediction_graph(df, sheet_name):
     # 그래프용 최근 30개 데이터
@@ -99,17 +87,22 @@ def plot_prediction_graph(df, sheet_name):
 
     return fig
 
-# 사이드바 상단에 업데이트 버튼
+# 캐싱된 데이터와 그래프를 저장할 세션 상태 초기화
+if 'cached_sheet_data' not in st.session_state:
+    st.session_state.cached_sheet_data = {}
+if 'cached_sheet_figs' not in st.session_state:
+    st.session_state.cached_sheet_figs = {}
+
+# 데이터 업데이트 버튼
 if st.sidebar.button("데이터 업데이트"):
-    # 모든 캐시 데이터 삭제
     st.cache_data.clear()
     st.session_state.cached_sheet_data = {}
     st.session_state.cached_sheet_figs = {}
     st.rerun()
-st.sidebar.markdown("---")
 
-# 초기 데이터 로드
 sheets, excel_file = load_data()
+
+st.sidebar.markdown("---")
 
 # 페이지 옵션 설정
 st.sidebar.markdown("<div style='font-size: 20px; font-weight: bold;'>지점 선택</div>", unsafe_allow_html=True)
@@ -118,54 +111,36 @@ selected_sheet = st.sidebar.selectbox("", page_options)
 
 st.sidebar.markdown("---")
 st.sidebar.markdown("**프로그램 정보**")
-st.sidebar.markdown("- 작성자 : 영산강조사실 이성호")
+st.sidebar.markdown("- 개발자 : 영산강조사실 이성호")
 st.sidebar.markdown("- 문의 : 내선번호 937")
-st.sidebar.markdown("- 최종 업데이트 : 2024-12-13")
-st.sidebar.markdown("---")
-st.sidebar.markdown("**데이터 로딩에는 기다림이 필요합니다.**")
+st.sidebar.markdown("- 버전 : Ver 1.241213")
 
 if selected_sheet == "메인페이지":
-    st.subheader("전체 지점 1일 예측 그래프")
-
-    # 모든 그래프를 캐시에서 가져오거나 생성
-    for sheet in sheets:
-        if sheet not in st.session_state.cached_sheet_data:
-            # 시트 데이터 캐시
-            df_sheet = load_sheet_data(excel_file, sheet)
-            st.session_state.cached_sheet_data[sheet] = df_sheet
-
-            # 그래프 캐시
-            fig = plot_prediction_graph(df_sheet, sheet)
-            st.session_state.cached_sheet_figs[sheet] = fig
-
-    # 그래프 출력
-    num_sheets = len(sheets)
-    for i in range(0, num_sheets, 2):
-        cols = st.columns(2)
-        for j in range(2):
-            if i + j < num_sheets:
-                sheet = sheets[i + j]
-                fig = st.session_state.cached_sheet_figs[sheet]
-                cols[j].pyplot(fig)
+    # 메인페이지 문구 및 mainpage.gif 표시
+    st.markdown("**A.I. 딥러닝을 통해 학습된 데이터를 기반으로 3시간, 6시간 이후의 수위를 예측한 모델링 자료입니다.**")
+    st.image("mainpage.gif", use_container_width=True)
 
 else:
-    # 선택된 시트의 데이터와 그래프를 캐시에서 가져오거나 생성
+    # 지점별 페이지
+    st.markdown("**예측 데이터는 실제 발생 수위와 차이가 발생할 수 있으니 사용시 유의하시기 바랍니다.**")
+
+    # 데이터 및 그래프 캐싱
     if selected_sheet not in st.session_state.cached_sheet_data:
         df = load_sheet_data(excel_file, selected_sheet)
         st.session_state.cached_sheet_data[selected_sheet] = df
 
-        # 그래프 생성 및 캐시
         fig = plot_prediction_graph(df, selected_sheet)
         st.session_state.cached_sheet_figs[selected_sheet] = fig
+
     else:
         df = st.session_state.cached_sheet_data[selected_sheet]
         fig = st.session_state.cached_sheet_figs[selected_sheet]
 
-    # 표 출력 (최근 174개)
-    df_table = df.sort_values('일시', ascending=False).head(174).reset_index(drop=True)
-    st.write(f"### {selected_sheet} 지점 최근 174개 데이터")
+    # 표 출력 (최근 126개)
+    df_table = df.sort_values('일시', ascending=False).head(126).reset_index(drop=True)
+    st.write(f"### {selected_sheet} 예측 데이터")
     st.dataframe(df_table, use_container_width=True)
 
     # 그래프 출력
-    st.write("### 1일 예측 그래프")
+    st.write("### 최근 24시간 그래프")
     st.pyplot(fig)
