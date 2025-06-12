@@ -107,13 +107,13 @@ st.sidebar.markdown("---")
 # 페이지 옵션 설정
 st.sidebar.markdown("<div style='font-size: 20px; font-weight: bold;'>지점 선택</div>", unsafe_allow_html=True)
 page_options = ["메인페이지"] + sheets
-selected_sheet = st.sidebar.selectbox("", page_options)
+selected_sheet = st.sidebar.selectbox("지점 선택", page_options, label_visibility="collapsed")
 
 st.sidebar.markdown("---")
 st.sidebar.markdown("**프로그램 정보**")
 st.sidebar.markdown("- 개발자 : 영산강조사실 이성호")
 st.sidebar.markdown("- 문의 : 내선번호 937")
-st.sidebar.markdown("- 버전 : Ver 1.250516")
+st.sidebar.markdown("- 버전 : Ver 1.250605")
 
 if selected_sheet == "메인페이지":
     # 메인페이지 문구 및 mainpage.gif 표시
@@ -137,7 +137,8 @@ else:
         fig = st.session_state.cached_sheet_figs[selected_sheet]
 
     # 표 출력 (최근 126개)
-    df_table = df.sort_values('일시', ascending=False).head(126).reset_index(drop=True)
+    df_table = (df.sort_values('일시', ascending=False).head(126).reset_index(drop=True).copy())
+    df_table['일시'] = pd.to_datetime(df_table['일시']).dt.strftime('%y-%m-%d %H')
     st.write(f"### {selected_sheet} 예측 데이터")
     st.dataframe(df_table, use_container_width=True)
 
